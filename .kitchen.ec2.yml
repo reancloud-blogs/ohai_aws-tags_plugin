@@ -1,0 +1,33 @@
+---
+driver:
+  name: ec2
+  aws_ssh_key_id: cookbook_test
+  region: us-east-1
+  availability_zone: a
+  require_chef_omnibus: true
+  instance_type: t2.nano
+  iam_profile_name: chef_ohai_hints
+  interface: dns
+  associate_public_ip: true
+
+transport:
+  ssh_key: <%= ENV['ssh_key_path'] %>/cookbook_test.pem
+  connection_timeout: 15
+  connection_retries: 5
+  username: ubuntu
+
+provisioner:
+  name: chef_zero
+  data_path: test/integration/default
+  environments_path: test/integration/environments
+  client_rb:
+    environment: test
+
+platforms:
+  - name: ubuntu-14.04
+
+suites:
+  - name: default
+    run_list:
+      - recipe[chef_ohai_hints::default]
+    attributes:

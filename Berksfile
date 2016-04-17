@@ -1,5 +1,5 @@
-source "https://supermarket.chef.io"
+source 'https://supermarket.chef.io'
 
 metadata
 
-depends "ohai"
+cookbook 'ohai'

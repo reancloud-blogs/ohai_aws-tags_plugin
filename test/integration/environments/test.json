@@ -1,0 +1,7 @@
+{
+  "name": "test",
+  "description": "Test Environment for chef_ohai_hints cookbook",
+  "chef_type": "environment",
+  "json_class": "Chef::Environment",
+  "default_attributes": {}
+}

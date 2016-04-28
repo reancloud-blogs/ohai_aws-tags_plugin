@@ -10,8 +10,8 @@
 include_recipe 'ohai'
 
 # Install ruby (and rubygems)
-package 'ruby' do
-  package_name 'ruby'
+package 'ruby2.2' do
+  package_name 'ruby2.2'
   action :install
 end
 

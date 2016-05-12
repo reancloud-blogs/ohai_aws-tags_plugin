@@ -1,20 +1,26 @@
-Ohai.plugin(AWSExt)do
+Ohai.plugin(:AWSExt) do
   provides 'awsext'
   depends 'ec2'
+  require 'aws-sdk'
 
-  aws Mash.new
+  collect_data do
+    aws Mash.new
 
-  aws[:region] = ec2[:placement_availability_zone].gsub(/[a-z]$/, '')
+    # get our region from placement_availability_zone from ohai ec2 hints
+    aws[:region] = ec2[:placement_availability_zone].gsub(/[a-z]$/, '')
 
-  ec2 = AWS::EC2::Client.new(:region)
+    # create our connection
+    ec2_instance = Aws::EC2::Instance.new(
+      region: aws[:region],
+      id: ec2[:instance_id]
+    )
 
-  ec2.describe_tags({
-    filters: [
-      {
-        name: "resource-id",
-        values: [ ec2[:instance_id] ],
-      },
-    ],
-    max_results: 50,
-    })
+    # assign an empty hash to the :tags key of aws
+    aws[:tags] = {}
+
+    # insert info about our tags into our new hash/key
+    ec2_instance.tags.each do |i|
+      aws[:tags][i.key.downcase.to_s] = i.value.downcase.to_s
+    end
+  end
 end

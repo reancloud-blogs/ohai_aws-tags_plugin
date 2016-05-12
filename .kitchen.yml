@@ -3,13 +3,23 @@ driver:
   name: vagrant
 
 provisioner:
-  name: chef_solo
+  name: chef_zero
+  data_path: test/integration/default
 
 platforms:
-  - name: ubuntu-14.04
   - name: centos-7.2
+  - name: ubuntu-14.04
 
 suites:
   - name: default
     run_list:
+      - recipe[chef_ohai_hints::default]
     attributes:
+      ohai:
+        plugin_path: /etc/chef/ohai_plugins
+      ec2:
+        placement_availability_zone: us-east-1a
+      aws:
+        tags:
+          name: ohai
+          environment: test

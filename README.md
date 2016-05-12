@@ -3,7 +3,7 @@
 ## Repository Layout
 While I imagine it would be easiest to have a single repository of custom Ohai plugins, instead of creating unique repositories for each plugin, it is useful to touch on how the code will be laid out.
 
-    $ berks cookbook chef-ohai-hints
+    $ berks cookbook chef_ohai_hints
 
 The Berkshelf utility (available from the ChefDK package) will create a repository structure that will be suitable for our needs.
 
@@ -21,21 +21,41 @@ It stands to reason that if you’re writing custom Ohai plugins, that you’re 
 
 In our example, we will be authoring some additional information about an EC2 instance, which are not available in the metadata (covered by the ec2 plugin in Ohai).
 
-### recipes/default.rb
+## Testing
 
-    package 'aws-sdk'  do
-      action :install
-      provider 'chef_gem'
-    end
+This cookbook includes linting and automated testing using:
 
-While we’re here, we may as well add in a quick resource to ensure that the standard ec2 plugin will populate inside a VPC.
+* [Rubocop](http://batsov.com/rubocop/)
+* [Foodcritic](http://acrmp.github.io/foodcritic/)
+* [ChefSpec](http://code.sethvargo.com/chefspec/)
+* [ServerSpec](http://serverspec.org/)
 
-    file '/etc/chef/ohai/hints/ec2.json' do
-      owner 'root'
-      group 'root'
-      mode 00755
-      action :create
-    end
+These tests are triggered through a `rake` configuration by the following commands:
 
+* `rake style`: Runs Rubocop and Foodcritic
+* `rake spec`: Runs ChefSpec
+* `rake integration:local`: Runs Test Kitchen and ServerSpec`
 
+## Test Kitchen
 
+This cookbook supports two Test Kitchen configurations:
+
+* EC2: Mimics a production deployment by using Amazon EC2. This will use your credentials and default configuration in your `~/.aws` directory.
+* Vagrant: For local testing. Uses CentOS 7.2 and Ubuntu 14.04.
+
+### Kitchen Vagrant
+
+The default Test Kitchen configuration used in this cookbook employs the Kitchen Vagrant driver.
+
+Run `kitchen converge` as usual to create and converge the box.
+
+### Kitchen EC2
+
+To use the Kitchen EC2 configuration, set the following environment variables:
+
+* `export KITCHEN_YAML=".kitchen.ec2.yml"`
+
+* Testing the cookbook will incur AWS charges. Please be mindful of this when converging this Test Kitchen configuration and destroy the instance when not in use.
+* Your AWS CLI credentials and configuration will be used. Ensure your credentials and configuration is present in `~/.aws/`.
+* The ohai_test SSH key (ohai_test.pem) (also configurable in .kitchen.yml) is used for the created EC2 instance. The environment variable `ssh_key_path` should be set to the path to this key.
+ * `export ssh_key_path="~/.ssh/path/to/key"`

@@ -8,6 +8,18 @@
 #
 include_recipe 'ohai'
 
+apt_repository 'ruby-ng' do
+  uri     'ppa:brightbox/ruby-ng'
+  distribution node['lsb']['codename']
+end
+
+apt_update 'update' do
+  action :nothing
+  subscribes :update, 'apt_repository[ruby-ng]' :immediately
+end
+
+package 'ruby2.2'
+
 package 'aws-sdk'  do
   action :install
   provider 'chef_gem'

@@ -19,7 +19,10 @@ apt_update 'update' do
   subscribes :update, 'apt_repository[ruby-ng]' :immediately
 end
 
-package 'ruby2.2'
+package 'ruby2.2' do
+  action :nothing
+  subscribes :install, 'apt_update[update]' :immediately
+end
 
 package 'aws-sdk'  do
 
